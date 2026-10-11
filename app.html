@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Broom math - calculators</title>
+<style>
+  :root { --accent: #c9a227; }
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Georgia, 'Times New Roman', serif; background: #fbf9f3; color: #29261c; line-height: 1.55; }
+  main { max-width: 1100px; margin: 0 auto; padding: 40px 20px 64px; }
+  h1 { font-size: 2rem; margin: 0 0 8px; color: var(--accent); }
+  .lede { margin: 0 0 28px; max-width: 640px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 18px; }
+  section { background: #fff; border: 1px solid #e6dfc8; border-radius: 8px; padding: 20px 22px; }
+  h2 { font-size: 1.15rem; margin: 0 0 6px; }
+  .hint { font-size: 0.9rem; color: #6f6845; margin: 0 0 14px; }
+  label { display: block; font-size: 0.9rem; margin: 10px 0 3px; }
+  input { width: 100%; padding: 8px 10px; font-size: 1rem; border: 1px solid #d0c69c; border-radius: 5px; font-family: inherit; }
+  button { margin-top: 16px; width: 100%; padding: 11px; background: var(--accent); color: #fff; border: 0; border-radius: 6px; font-size: 1rem; cursor: pointer; font-family: inherit; }
+  button:hover { filter: brightness(1.08); }
+  .out { margin-top: 14px; font-size: 1rem; min-height: 1.4em; }
+  .out.err { color: #a32222; }
+  footer { max-width: 1100px; margin: 0 auto; padding: 0 20px 40px; font-size: 0.85rem; color: #8f8871; }
+  a { color: var(--accent); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Broom math</h1>
+  <p class="lede">Strokes per room, minutes per week and months per broom head. Exact arithmetic, every borrowed number labeled.</p>
+  <div class="grid">
+    <section>
+      <h2>Sweep plan</h2>
+      <p class="hint">A room becomes strokes and minutes.</p>
+      <label for="w-width">Broom width (cm)</label>
+      <input id="w-width" type="number" value="30" min="0" step="1">
+      <label for="w-stroke">Stroke length (m)</label>
+      <input id="w-stroke" type="number" value="1" min="0" step="0.1">
+      <label for="w-room">Room size (m²)</label>
+      <input id="w-room" type="number" value="20" min="0" step="1">
+      <button id="w-go">Count the strokes</button>
+      <div class="out" id="w-out"></div>
+    </section>
+    <section>
+      <h2>Week plan</h2>
+      <p class="hint">A routine becomes hours a year.</p>
+      <label for="k-rooms">Rooms</label>
+      <input id="k-rooms" type="number" value="3" min="0" step="1">
+      <label for="k-size">Average room size (m²)</label>
+      <input id="k-size" type="number" value="20" min="0" step="1">
+      <label for="k-per">Sweeps a week</label>
+      <input id="k-per" type="number" value="2" min="0" step="1">
+      <label for="k-width">Broom width (cm)</label>
+      <input id="k-width" type="number" value="30" min="0" step="1">
+      <label for="k-stroke">Stroke length (m)</label>
+      <input id="k-stroke" type="number" value="1" min="0" step="0.1">
+      <button id="k-go">Count the week</button>
+      <div class="out" id="k-out"></div>
+    </section>
+    <section>
+      <h2>Head plan</h2>
+      <p class="hint">A pace becomes heads and cost.</p>
+      <label for="h-hours">Sweeping hours a week</label>
+      <input id="h-hours" type="number" value="2" min="0" step="0.5">
+      <label for="h-cost">Price per broom head</label>
+      <input id="h-cost" type="number" value="8" min="0" step="0.5">
+      <button id="h-go">Weigh the head</button>
+      <div class="out" id="h-out"></div>
+    </section>
+  </div>
+</main>
+<footer>Built by the app factory. <a href="index.html">About</a> &middot; <a href="https://github.com/iLanis-agent/broommath">Source</a></footer>
+<script src="engine.js"></script>
+<script>
+function num(id){ return parseFloat(document.getElementById(id).value); }
+function show(id, r, render){
+  var el = document.getElementById(id);
+  if (r.error) { el.textContent = r.error; el.classList.add('err'); }
+  else { el.textContent = render(r); el.classList.remove('err'); }
+}
+document.getElementById('w-go').addEventListener('click', function(){
+  show('w-out', BroomMath.sweepPlan(num('w-width'),num('w-stroke'),num('w-room')), BroomMath.renderSweep);
+});
+document.getElementById('k-go').addEventListener('click', function(){
+  show('k-out', BroomMath.weekPlan(num('k-rooms'),num('k-size'),num('k-per'),num('k-width'),num('k-stroke')), function(r){ return BroomMath.renderWeek(r, num('k-rooms'), num('k-per')); });
+});
+document.getElementById('h-go').addEventListener('click', function(){
+  show('h-out', BroomMath.headPlan(num('h-hours'),num('h-cost')), function(r){ return BroomMath.renderHead(r, num('h-hours')); });
+});
+</script>
+</body>
+</html>
